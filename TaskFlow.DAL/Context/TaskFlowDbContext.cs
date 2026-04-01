@@ -1,9 +1,10 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using TaskFlow.DAL.Entities;
 
 namespace TaskFlow.DAL.Context;
 
-public class TaskFlowDbContext(DbContextOptions<TaskFlowDbContext> options) : DbContext(options)
+public class TaskFlowDbContext(DbContextOptions<TaskFlowDbContext> options) : IdentityDbContext<ApplicationUser>(options)
 {
     public DbSet<ProjectEntity> Projects => Set<ProjectEntity>();
     public DbSet<TaskItemEntity> TaskItems => Set<TaskItemEntity>();
@@ -13,6 +14,8 @@ public class TaskFlowDbContext(DbContextOptions<TaskFlowDbContext> options) : Db
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<ProjectEntity>(entity =>
         {
             entity.Property(x => x.Name).HasMaxLength(200).IsRequired();
@@ -56,8 +59,6 @@ public class TaskFlowDbContext(DbContextOptions<TaskFlowDbContext> options) : Db
                 .WithMany(x => x.TaskItemTags)
                 .HasForeignKey(x => x.TaskTagId);
         });
-
-        base.OnModelCreating(modelBuilder);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
