@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.BLL.DTOs;
 using TaskFlow.BLL.Services.Interfaces;
@@ -6,6 +7,7 @@ namespace TaskFlow.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class TaskCommentsController(ITaskCommentService taskCommentService) : ControllerBase
 {
     [HttpGet("by-task/{taskItemId:int}")]
