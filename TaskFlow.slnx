@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+  </Folder>
+  <Project Path="TaskFlow.API/TaskFlow.API.csproj" />
+  <Project Path="TaskFlow.BLL.UnitTests/TaskFlow.BLL.UnitTests.csproj" />
+  <Project Path="TaskFlow.BLL/TaskFlow.BLL.csproj" />
+  <Project Path="TaskFlow.DAL/TaskFlow.DAL.csproj" />
+</Solution>
