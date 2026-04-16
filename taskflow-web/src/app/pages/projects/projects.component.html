@@ -1,0 +1,36 @@
+<section class="panel">
+  <div class="header">
+    <div>
+      <h1>Projects</h1>
+      <p class="muted">
+        Guarded route. Requests go to <code>/api/projects</code> with <code>Authorization: Bearer</code>.
+      </p>
+    </div>
+
+    <div class="right">
+      <span class="token" title="JWT preview">JWT: {{ tokenPreview() }}...</span>
+      <button class="secondary" (click)="logout()">Logout</button>
+      <button (click)="load()">Refresh</button>
+    </div>
+  </div>
+
+  @if (busy()) {
+    <div class="muted">Loading...</div>
+  }
+
+  @if (error()) {
+    <div class="error">{{ error() }}</div>
+  }
+
+  @if (!busy() && !error()) {
+    <ul class="list">
+      @for (p of projects(); track p.id) {
+        <li>
+          <span class="id">#{{ p.id }}</span>
+          <span class="name">{{ p.name }}</span>
+        </li>
+      }
+    </ul>
+  }
+</section>
+
