@@ -2,6 +2,10 @@
   max-width: 860px;
   margin: 0 auto;
   padding: 1.5rem;
+  background: rgba(15, 23, 42, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.25rem;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
 }
 
 .header {
@@ -10,7 +14,9 @@
   align-items: flex-start;
   margin-bottom: 1.5rem;
 
-  h1 { margin: 0 0 0.25rem; }
+  h1 {
+    margin: 0 0 0.25rem;
+  }
 }
 
 .right {
@@ -20,15 +26,16 @@
 }
 
 .create-panel {
-  background: #f9f9f9;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
   margin-bottom: 1.5rem;
 
   h2 {
     margin: 0 0 0.75rem;
     font-size: 1rem;
+    color: #dbeafe;
   }
 }
 
@@ -60,10 +67,11 @@
   margin: 1rem 0 0;
 
   li {
-    padding: 0.6rem 0.75rem;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    margin-bottom: 0.5rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+    margin-bottom: 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
   }
 }
 
