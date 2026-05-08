@@ -3,11 +3,11 @@ using System.ComponentModel.DataAnnotations;
 namespace TaskFlow.API.Auth;
 
 public sealed record RegisterRequest(
-    [property:EmailAddress][property:Required] string Email,
-    [property:Required][property:MinLength(8)] string Password);
+    [EmailAddress][Required] string Email,
+    [Required][MinLength(8)] string Password);
 
 public sealed record LoginRequest(
-    [property:EmailAddress][property:Required] string Email,
-    [property:Required] string Password);
+    [EmailAddress][Required] string Email,
+    [Required] string Password);
 
 public sealed record LoginResponse(string AccessToken, DateTimeOffset ExpiresAtUtc, string Email, IReadOnlyList<string> Roles);
