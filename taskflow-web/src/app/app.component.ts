@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Component, computed, inject } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { AuthService } from './core/auth/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -10,4 +11,12 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 })
 export class AppComponent {
   title = 'taskflow-web';
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+  readonly isAuthenticated = computed(() => this.auth.isAuthenticated());
+
+  async logout() {
+    this.auth.logout();
+    await this.router.navigateByUrl('/login');
+  }
 }

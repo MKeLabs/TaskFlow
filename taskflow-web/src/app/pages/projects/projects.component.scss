@@ -55,6 +55,17 @@ button.secondary {
   background: rgba(255, 255, 255, 0.06);
 }
 
+button.danger {
+  border-color: rgba(239, 68, 68, 0.55);
+  background: rgba(239, 68, 68, 0.18);
+}
+
+button.small {
+  padding: 6px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
 .list {
   list-style: none;
   padding: 0;
@@ -65,11 +76,25 @@ button.secondary {
 
 li {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
   gap: 10px;
   padding: 10px 12px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(0, 0, 0, 0.15);
+}
+
+.item-main {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.item-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
 .id {
@@ -84,5 +109,19 @@ li {
   border-radius: 12px;
   border: 1px solid rgba(239, 68, 68, 0.5);
   background: rgba(239, 68, 68, 0.12);
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.field input {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.2);
+  color: #e5e7eb;
 }
 

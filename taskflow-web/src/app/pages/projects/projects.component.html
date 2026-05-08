@@ -9,7 +9,7 @@
 
     <div class="right">
       <span class="token" title="JWT preview">JWT: {{ tokenPreview() }}...</span>
-      <button class="secondary" (click)="logout()">Logout</button>
+      <button (click)="openCreateModal()">New Project</button>
       <button (click)="load()">Refresh</button>
     </div>
   </div>
@@ -26,11 +26,42 @@
     <ul class="list">
       @for (p of projects(); track p.id) {
         <li>
-          <span class="id">#{{ p.id }}</span>
-          <span class="name">{{ p.name }}</span>
+          <div class="item-main">
+            <span class="id">#{{ p.id }}</span>
+            <span class="name">{{ p.name }}</span>
+          </div>
+          <div class="item-actions">
+            <button class="secondary small" (click)="openEditModal(p)">Edit</button>
+            <button class="danger small" (click)="delete(p)">Delete</button>
+          </div>
         </li>
       }
     </ul>
   }
 </section>
+
+@if (modalOpen()) {
+  <app-modal
+    [title]="modalTitle()"
+    [description]="modalDescription()"
+    [saveLabel]="modalSaveLabel()"
+    [busy]="modalBusy()"
+    (cancel)="closeModal()"
+    (confirm)="saveModal()">
+    <label class="field">
+      <span>Name</span>
+      <input
+        #modalNameInput
+        [value]="modalForm().name"
+        (input)="setModalName(modalNameInput.value)"
+        [disabled]="modalBusy()"
+        placeholder="Project name"
+      />
+    </label>
+
+    @if (modalError()) {
+      <div class="error">{{ modalError() }}</div>
+    }
+  </app-modal>
+}
 

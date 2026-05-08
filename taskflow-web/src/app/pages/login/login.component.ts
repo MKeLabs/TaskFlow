@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+import { Observable } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
@@ -29,46 +30,53 @@ export class LoginComponent {
   ) {}
 
   submit() {
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/projects';
+    this.authenticate(
+      this.auth.login(this.form.getRawValue()),
+      'Login failed. Check your email/password.',
+      returnUrl
+    );
+  }
+
+  register() {
+    this.authenticate(
+      this.auth.register(this.form.getRawValue()),
+      'Register failed. The user may already exist.',
+      '/projects'
+    );
+  }
+
+  private authenticate(
+    request$: Observable<unknown>,
+    failureMessage: string,
+    redirectTo: string
+  ) {
     this.error.set(null);
 
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
+    if (!this.ensureValidForm()) {
       return;
     }
 
     this.busy.set(true);
-    this.auth.login(this.form.getRawValue()).subscribe({
+    request$.subscribe({
       next: async () => {
-        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/projects';
-        await this.router.navigateByUrl(returnUrl);
+        await this.router.navigateByUrl(redirectTo);
       },
       error: () => {
-        this.error.set('Login failed. Check your email/password.');
+        this.error.set(failureMessage);
         this.busy.set(false);
       },
       complete: () => this.busy.set(false)
     });
   }
 
-  register() {
-    this.error.set(null);
-
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
+  private ensureValidForm(): boolean {
+    if (this.form.valid) {
+      return true;
     }
 
-    this.busy.set(true);
-    this.auth.register(this.form.getRawValue()).subscribe({
-      next: async () => {
-        await this.router.navigateByUrl('/projects');
-      },
-      error: () => {
-        this.error.set('Register failed. The user may already exist.');
-        this.busy.set(false);
-      },
-      complete: () => this.busy.set(false)
-    });
+    this.form.markAllAsTouched();
+    return false;
   }
 }
 
