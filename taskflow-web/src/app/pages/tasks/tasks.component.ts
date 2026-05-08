@@ -15,7 +15,7 @@ import {
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './tasks.component.html',
-  styleUrl: './tasks.component.scss',
+  styleUrls: ['./tasks.component.scss'],
 })
 export class TasksComponent {
   readonly busy = signal(true);
@@ -51,6 +51,29 @@ export class TasksComponent {
       error: () => this.error.set('Could not load tasks. Are you logged in?'),
       complete: () => this.busy.set(false),
     });
+  }
+
+  onProjectIdChange(value: string | number) {
+    this.newForm.update((f) => ({
+      ...f,
+      projectId: Number(value) || 0,
+    }));
+  }
+
+  onNameChange(value: string) {
+    this.newForm.update((f) => ({ ...f, name: value || '' }));
+  }
+
+  onDescriptionChange(value: string) {
+    this.newForm.update((f) => ({ ...f, description: value || null }));
+  }
+
+  onStatusChange(value: string | number) {
+    this.newForm.update((f) => ({ ...f, status: Number(value) || 0 }));
+  }
+
+  onCategoryChange(value: string | number) {
+    this.newForm.update((f) => ({ ...f, category: Number(value) || 0 }));
   }
 
   createTask() {

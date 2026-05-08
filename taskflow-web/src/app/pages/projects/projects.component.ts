@@ -9,7 +9,7 @@ import { ModalComponent } from '../../shared/ui/modal/modal.component';
   standalone: true,
   imports: [CommonModule, ModalComponent],
   templateUrl: './projects.component.html',
-  styleUrl: './projects.component.scss'
+  styleUrls: ['./projects.component.scss']
 })
 export class ProjectsComponent {
   readonly busy = signal(true);
