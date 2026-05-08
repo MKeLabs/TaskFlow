@@ -1,0 +1,114 @@
+<section class="panel">
+  <div class="header">
+    <div>
+      <h1>Tasks</h1>
+      <p class="muted">
+        Requests go to <code>/api/taskitems</code> with <code>Authorization: Bearer</code>.
+      </p>
+    </div>
+    <div class="right">
+      <button (click)="load()" [disabled]="busy()">Refresh</button>
+    </div>
+  </div>
+
+  <!-- Create form -->
+  <div class="create-panel">
+    <h2>New Task</h2>
+
+    <div class="form-row">
+      <label>
+        <span>Project ID</span>
+        <input
+          type="number"
+          [ngModel]="newForm().projectId || null"
+          (ngModelChange)="newForm.update(f => ({ ...f, projectId: +$event }))"
+          placeholder="e.g. 1"
+          [disabled]="creating()"
+        />
+      </label>
+
+      <label>
+        <span>Name</span>
+        <input
+          type="text"
+          [ngModel]="newForm().name"
+          (ngModelChange)="newForm.update(f => ({ ...f, name: $event }))"
+          placeholder="Task name"
+          [disabled]="creating()"
+        />
+      </label>
+    </div>
+
+    <div class="form-row">
+      <label>
+        <span>Description <em>(optional)</em></span>
+        <input
+          type="text"
+          [ngModel]="newForm().description"
+          (ngModelChange)="newForm.update(f => ({ ...f, description: $event }))"
+          placeholder="Short description"
+          [disabled]="creating()"
+        />
+      </label>
+    </div>
+
+    <div class="form-row">
+      <label>
+        <span>Status</span>
+        <select
+          [ngModel]="newForm().status"
+          (ngModelChange)="newForm.update(f => ({ ...f, status: +$event }))"
+          [disabled]="creating()">
+          @for (opt of statusOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        <span>Category</span>
+        <select
+          [ngModel]="newForm().category"
+          (ngModelChange)="newForm.update(f => ({ ...f, category: +$event }))"
+          [disabled]="creating()">
+          @for (opt of categoryOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    <button (click)="createTask()" [disabled]="creating() || busy()">
+      {{ creating() ? 'Creating…' : 'Create task' }}
+    </button>
+  </div>
+
+  @if (error()) {
+    <div class="error">{{ error() }}</div>
+  }
+
+  @if (busy()) {
+    <div class="muted">Loading…</div>
+  }
+
+  @if (!busy()) {
+    <ul class="list">
+      @for (t of tasks(); track t.id) {
+        <li>
+          <div class="item-main">
+            <span class="id">#{{ t.id }}</span>
+            <a class="name" [routerLink]="['/tasks', t.id]">{{ t.name }}</a>
+            <span class="badge">{{ statusLabels[t.status] }}</span>
+            <span class="badge secondary">{{ categoryLabels[t.category] }}</span>
+          </div>
+          <div class="item-sub">
+            <span class="muted">{{ t.projectName }}</span>
+            @if (t.description) {
+              <span class="muted"> — {{ t.description }}</span>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</section>
