@@ -13,7 +13,7 @@ import {
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './task-detail.component.html',
-  styleUrl: './task-detail.component.scss',
+  styleUrls: ['./task-detail.component.scss'],
 })
 export class TaskDetailComponent {
   readonly busy = signal(true);
@@ -37,5 +37,9 @@ export class TaskDetailComponent {
       error: () => this.error.set('Task not found or you do not have access.'),
       complete: () => this.busy.set(false),
     });
+  }
+
+  getTagNames(task: TaskItemDto): string {
+    return task.tags?.length ? task.tags.map((tag) => tag.name).join(', ') : '—';
   }
 }

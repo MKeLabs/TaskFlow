@@ -14,54 +14,43 @@
     </div>
   </div>
 
-  @if (busy()) {
-    <div class="muted">Loading...</div>
-  }
+  <div class="muted" *ngIf="busy()">Loading...</div>
 
-  @if (error()) {
-    <div class="error">{{ error() }}</div>
-  }
+  <div class="error" *ngIf="error()">{{ error() }}</div>
 
-  @if (!busy() && !error()) {
-    <ul class="list">
-      @for (p of projects(); track p.id) {
-        <li>
-          <div class="item-main">
-            <span class="id">#{{ p.id }}</span>
-            <span class="name">{{ p.name }}</span>
-          </div>
-          <div class="item-actions">
-            <button class="secondary small" (click)="openEditModal(p)">Edit</button>
-            <button class="danger small" (click)="delete(p)">Delete</button>
-          </div>
-        </li>
-      }
-    </ul>
-  }
+  <ul class="list" *ngIf="!busy() && !error()">
+    <li *ngFor="let p of projects()">
+      <div class="item-main">
+        <span class="id">#{{ p.id }}</span>
+        <span class="name">{{ p.name }}</span>
+      </div>
+      <div class="item-actions">
+        <button class="secondary small" (click)="openEditModal(p)">Edit</button>
+        <button class="danger small" (click)="delete(p)">Delete</button>
+      </div>
+    </li>
+  </ul>
 </section>
 
-@if (modalOpen()) {
-  <app-modal
-    [title]="modalTitle()"
-    [description]="modalDescription()"
-    [saveLabel]="modalSaveLabel()"
-    [busy]="modalBusy()"
-    (cancel)="closeModal()"
-    (confirm)="saveModal()">
-    <label class="field">
-      <span>Name</span>
-      <input
-        #modalNameInput
-        [value]="modalForm().name"
-        (input)="setModalName(modalNameInput.value)"
-        [disabled]="modalBusy()"
-        placeholder="Project name"
-      />
-    </label>
+<app-modal
+  *ngIf="modalOpen()"
+  [title]="modalTitle()"
+  [description]="modalDescription()"
+  [saveLabel]="modalSaveLabel()"
+  [busy]="modalBusy()"
+  (cancel)="closeModal()"
+  (confirm)="saveModal()">
+  <label class="field">
+    <span>Name</span>
+    <input
+      #modalNameInput
+      [value]="modalForm().name"
+      (input)="setModalName(modalNameInput.value)"
+      [disabled]="modalBusy()"
+      placeholder="Project name"
+    />
+  </label>
 
-    @if (modalError()) {
-      <div class="error">{{ modalError() }}</div>
-    }
-  </app-modal>
-}
+  <div class="error" *ngIf="modalError()">{{ modalError() }}</div>
+</app-modal>
 
