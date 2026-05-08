@@ -1,0 +1,75 @@
+.detail-shell {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: 1.25rem;
+  font-size: 0.875rem;
+  color: #555;
+  text-decoration: none;
+
+  &:hover { text-decoration: underline; }
+}
+
+.card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.25rem;
+  background: #fff;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+
+  h1 {
+    margin: 0 0 0.2rem;
+    font-size: 1.25rem;
+  }
+
+  p { margin: 0; }
+}
+
+.badges {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  margin-left: 1rem;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 0.5rem 1rem;
+  margin: 0;
+
+  dt {
+    font-size: 0.8rem;
+    color: #888;
+    font-weight: 500;
+    padding-top: 0.1rem;
+  }
+
+  dd { margin: 0; font-size: 0.9rem; }
+}
+
+.badge {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: #e8f0fe;
+  color: #1a5fcc;
+
+  &.secondary {
+    background: #f0f0f0;
+    color: #555;
+  }
+}
+
+.muted { color: #888; }
+.error { color: #c0392b; }

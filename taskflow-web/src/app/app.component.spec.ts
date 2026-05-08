@@ -14,16 +14,13 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'taskflow-web' title`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('taskflow-web');
-  });
-
-  it('should render title', () => {
+  it('should render shell brand and nav links', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, taskflow-web');
+
+    expect(compiled.querySelector('.brand')?.textContent).toContain('TaskFlow');
+    expect(compiled.querySelector('a[routerLink="/projects"]')?.textContent).toContain('Projects');
+    expect(compiled.querySelector('a[routerLink="/login"]')?.textContent).toContain('Login');
   });
 });

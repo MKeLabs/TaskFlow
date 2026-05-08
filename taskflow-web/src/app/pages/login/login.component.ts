@@ -23,6 +23,14 @@ export class LoginComponent {
     password: ['', [Validators.required, Validators.minLength(8)]]
   });
 
+  get emailCtrl() {
+    return this.form.controls.email;
+  }
+
+  get passwordCtrl() {
+    return this.form.controls.password;
+  }
+
   constructor(
     private readonly auth: AuthService,
     private readonly router: Router,

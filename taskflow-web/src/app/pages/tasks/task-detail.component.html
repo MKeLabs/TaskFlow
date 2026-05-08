@@ -1,0 +1,46 @@
+<div class="detail-shell">
+  <a class="back" routerLink="/tasks">← Back to Tasks</a>
+
+  @if (busy()) {
+    <div class="muted">Loading…</div>
+  }
+
+  @if (error()) {
+    <div class="error">{{ error() }}</div>
+  }
+
+  @if (task(); as t) {
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <h1>{{ t.name }}</h1>
+          <p class="muted">{{ t.projectName }}</p>
+        </div>
+        <div class="badges">
+          <span class="badge">{{ statusLabels[t.status] }}</span>
+          <span class="badge secondary">{{ categoryLabels[t.category] }}</span>
+        </div>
+      </div>
+
+      <dl class="fields">
+        <dt>ID</dt>
+        <dd>#{{ t.id }}</dd>
+
+        <dt>Project ID</dt>
+        <dd>{{ t.projectId }}</dd>
+
+        <dt>Description</dt>
+        <dd>{{ t.description ?? '—' }}</dd>
+
+        <dt>Due date</dt>
+        <dd>{{ t.dueDate ? (t.dueDate | date:'mediumDate') : '—' }}</dd>
+
+        <dt>Tags</dt>
+        <dd>{{ t.tags.length ? t.tags.map(tag => tag.name).join(', ') : '—' }}</dd>
+
+        <dt>Comments</dt>
+        <dd>{{ t.comments.length }} comment(s)</dd>
+      </dl>
+    </section>
+  }
+</div>
