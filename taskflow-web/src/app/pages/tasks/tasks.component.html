@@ -17,14 +17,14 @@
 
     <div class="form-row">
       <label>
-        <span>Project ID</span>
-        <input
-          type="number"
+        <span>Project</span>
+        <select
           [ngModel]="newForm().projectId"
           (ngModelChange)="onProjectIdChange($event)"
-          placeholder="e.g. 1"
-          [disabled]="creating()"
-        />
+          [disabled]="creating()">
+          <option [value]="0" disabled>Select a project</option>
+          <option *ngFor="let p of projects()" [value]="p.id">{{ p.name }}</option>
+        </select>
       </label>
 
       <label>
