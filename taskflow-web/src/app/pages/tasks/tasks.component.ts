@@ -9,6 +9,7 @@ import {
   TASK_STATUS_LABELS,
   TASK_CATEGORY_LABELS,
 } from '../../core/api/task-items.api';
+import { ProjectsApi, ProjectDto } from '../../core/api/projects.api';
 
 @Component({
   selector: 'app-tasks',
@@ -33,13 +34,25 @@ export class TasksComponent {
     tagIds: [],
   });
 
+  readonly projects = signal<ProjectDto[]>([]);
+
   readonly statusLabels = TASK_STATUS_LABELS;
   readonly categoryLabels = TASK_CATEGORY_LABELS;
   readonly statusOptions = Object.entries(TASK_STATUS_LABELS).map(([v, l]) => ({ value: +v, label: l }));
   readonly categoryOptions = Object.entries(TASK_CATEGORY_LABELS).map(([v, l]) => ({ value: +v, label: l }));
 
-  constructor(private readonly api: TaskItemsApi) {
+  constructor(
+    private readonly api: TaskItemsApi,
+    private readonly projectsApi: ProjectsApi,
+  ) {
+    this.loadProjects();
     this.load();
+  }
+
+  loadProjects() {
+    this.projectsApi.getAll().subscribe({
+      next: (items) => this.projects.set(items),
+    });
   }
 
   load() {
@@ -81,7 +94,7 @@ export class TasksComponent {
     const form = this.newForm();
 
     if (!form.projectId || form.projectId <= 0) {
-      this.error.set('Project ID is required.');
+      this.error.set('Please select a project.');
       return;
     }
 
