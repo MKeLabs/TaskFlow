@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.BLL.DTOs;
 using TaskFlow.BLL.Services.Interfaces;
+using TaskFlow.DAL.Auth;
 
 namespace TaskFlow.API.Controllers;
 
@@ -22,6 +23,7 @@ public class ProjectsController(IProjectService projectService) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = AppRoles.Admin)]
     public async Task<ActionResult<ProjectDto>> Create([FromBody] ProjectUpsertDto dto, CancellationToken cancellationToken)
     {
         var created = await projectService.CreateAsync(dto, cancellationToken);
@@ -29,10 +31,12 @@ public class ProjectsController(IProjectService projectService) : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = AppRoles.Admin)]
     public async Task<IActionResult> Update(int id, [FromBody] ProjectUpsertDto dto, CancellationToken cancellationToken) =>
         await projectService.UpdateAsync(id, dto, cancellationToken) ? NoContent() : NotFound();
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = AppRoles.Admin)]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken) =>
         await projectService.DeleteAsync(id, cancellationToken) ? NoContent() : NotFound();
 }

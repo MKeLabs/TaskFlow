@@ -5,11 +5,27 @@ import { LoginRequest, LoginResponse, MeResponse } from './auth.models';
 
 const TOKEN_KEY = 'taskflow_access_token';
 
+// ASP.NET Identity encodes ClaimTypes.Role under this URI in the JWT payload.
+const ROLE_CLAIM = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
+
+function parseRoles(token: string | null): string[] {
+  if (!token) return [];
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const raw = payload[ROLE_CLAIM];
+    if (!raw) return [];
+    return Array.isArray(raw) ? raw : [raw];
+  } catch {
+    return [];
+  }
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly _token = signal<string | null>(localStorage.getItem(TOKEN_KEY));
   readonly token = computed(() => this._token());
   readonly isAuthenticated = computed(() => !!this._token());
+  readonly isAdmin = computed(() => parseRoles(this._token()).includes('Admin'));
 
   constructor(private readonly http: HttpClient) {}
 

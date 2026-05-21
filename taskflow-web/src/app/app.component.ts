@@ -14,6 +14,7 @@ export class AppComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   readonly isAuthenticated = computed(() => this.auth.isAuthenticated());
+  readonly isAdmin = computed(() => this.auth.isAdmin());
 
   async logout() {
     this.auth.logout();
