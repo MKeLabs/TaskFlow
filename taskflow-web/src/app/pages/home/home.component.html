@@ -1,0 +1,34 @@
+<div class="home">
+  <div class="hero">
+    <div class="logo">TF</div>
+    <h1>TaskFlow</h1>
+    <p class="subtitle">A full-stack task management app built with Angular and .NET.</p>
+  </div>
+
+  @if (!isAuthenticated()) {
+    <div class="cards">
+      <a class="card primary" routerLink="/login">
+        <span class="card-title">Get started</span>
+        <span class="card-desc">Log in or create an account to manage your tasks.</span>
+      </a>
+    </div>
+  }
+
+  @if (isAuthenticated()) {
+    <div class="cards">
+      <a class="card" routerLink="/tasks">
+        <span class="card-icon">✓</span>
+        <span class="card-title">Tasks</span>
+        <span class="card-desc">View and create tasks across all projects.</span>
+      </a>
+
+      @if (isAdmin()) {
+        <a class="card" routerLink="/projects">
+          <span class="card-icon">◈</span>
+          <span class="card-title">Projects</span>
+          <span class="card-desc">Create and manage projects. Admin only.</span>
+        </a>
+      }
+    </div>
+  }
+</div>

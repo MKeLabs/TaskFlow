@@ -79,16 +79,97 @@
     </button>
   </div>
 
+  <!-- Edit form -->
+  <div class="create-panel" *ngIf="editing() as e">
+    <div class="edit-header">
+      <h2>Edit Task #{{ e.id }}</h2>
+      <button class="btn-ghost" type="button" (click)="cancelEdit()">Cancel</button>
+    </div>
+
+    <div class="form-row">
+      <label>
+        <span>Project</span>
+        <select
+          [ngModel]="editForm().projectId"
+          (ngModelChange)="onEditProjectIdChange($event)"
+          [disabled]="saving()">
+          <option [value]="0" disabled>Select a project</option>
+          <option *ngFor="let p of projects()" [value]="p.id">{{ p.name }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Name</span>
+        <input
+          type="text"
+          [ngModel]="editForm().name"
+          (ngModelChange)="onEditNameChange($event)"
+          [disabled]="saving()"
+        />
+      </label>
+    </div>
+
+    <div class="form-row">
+      <label>
+        <span>Description <em>(optional)</em></span>
+        <input
+          type="text"
+          [ngModel]="editForm().description"
+          (ngModelChange)="onEditDescriptionChange($event)"
+          [disabled]="saving()"
+        />
+      </label>
+    </div>
+
+    <div class="form-row">
+      <label>
+        <span>Status</span>
+        <select
+          [ngModel]="editForm().status"
+          (ngModelChange)="onEditStatusChange($event)"
+          [disabled]="saving()">
+          <option *ngFor="let opt of statusOptions" [value]="opt.value">{{ opt.label }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Category</span>
+        <select
+          [ngModel]="editForm().category"
+          (ngModelChange)="onEditCategoryChange($event)"
+          [disabled]="saving()">
+          <option *ngFor="let opt of categoryOptions" [value]="opt.value">{{ opt.label }}</option>
+        </select>
+      </label>
+    </div>
+
+    <button (click)="saveEdit()" [disabled]="saving()">
+      {{ saving() ? 'Saving…' : 'Save changes' }}
+    </button>
+  </div>
+
   <div class="error" *ngIf="error()">{{ error() }}</div>
   <div class="muted" *ngIf="busy()">Loading…</div>
 
   <ul class="list" *ngIf="!busy()">
-    <li *ngFor="let t of tasks(); let i = index">
+    <li *ngFor="let t of tasks()">
       <div class="item-main">
         <span class="id">#{{ t.id }}</span>
         <a class="name" [routerLink]="['/tasks', t.id]">{{ t.name }}</a>
         <span class="badge">{{ statusLabels[t.status] }}</span>
         <span class="badge secondary">{{ categoryLabels[t.category] }}</span>
+        <div class="item-actions">
+          <button class="btn-sm" type="button"
+            (click)="startEdit(t)"
+            [disabled]="!!deletingId() || !!editing()">
+            Edit
+          </button>
+          <button class="btn-sm danger" type="button"
+            (click)="deleteTask(t.id)"
+            [disabled]="deletingId() === t.id">
+            {{ deletingId() === t.id ? '…' : 'Delete' }}
+          </button>
+        </div>
       </div>
       <div class="item-sub">
         <span class="muted">{{ t.projectName }}</span>

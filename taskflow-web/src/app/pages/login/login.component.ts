@@ -38,7 +38,7 @@ export class LoginComponent {
   ) {}
 
   submit() {
-    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/projects';
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/';
     this.authenticate(
       this.auth.login(this.form.getRawValue()),
       'Login failed. Check your email/password.',
@@ -50,7 +50,7 @@ export class LoginComponent {
     this.authenticate(
       this.auth.register(this.form.getRawValue()),
       'Register failed. The user may already exist.',
-      '/projects'
+      '/'
     );
   }
 
