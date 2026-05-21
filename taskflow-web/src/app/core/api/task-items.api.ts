@@ -11,10 +11,20 @@ export interface TaskItemDto {
   category: number;
   dueDate: string | null;
   tags: { id: number; name: string }[];
-  comments: { id: number; content: string }[];
+  comments: { id: number; text: string }[];
 }
 
 export interface CreateTaskItemRequest {
+  projectId: number;
+  name: string;
+  description: string | null;
+  status: number;
+  category: number;
+  dueDate: string | null;
+  tagIds: number[];
+}
+
+export interface UpdateTaskItemRequest {
   projectId: number;
   name: string;
   description: string | null;
@@ -52,5 +62,13 @@ export class TaskItemsApi {
 
   create(request: CreateTaskItemRequest) {
     return this.http.post<TaskItemDto>('/api/taskitems', request);
+  }
+
+  update(id: number, request: UpdateTaskItemRequest) {
+    return this.http.put<void>(`/api/taskitems/${id}`, request);
+  }
+
+  delete(id: number) {
+    return this.http.delete<void>(`/api/taskitems/${id}`);
   }
 }

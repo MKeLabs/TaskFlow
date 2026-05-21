@@ -31,9 +31,40 @@
 
       <dt>Tags</dt>
       <dd>{{ getTagNames(t) }}</dd>
-
-      <dt>Comments</dt>
-      <dd>{{ t.comments.length }} comment(s)</dd>
     </dl>
+
+    <div class="comments">
+      <h3>Comments</h3>
+
+      <ul class="comment-list" *ngIf="t.comments.length">
+        <li *ngFor="let c of t.comments" class="comment-item">
+          <span class="comment-text">{{ c.text }}</span>
+          <button
+            class="btn-sm danger"
+            type="button"
+            (click)="deleteComment(c.id)"
+            [disabled]="deletingCommentId() === c.id">
+            {{ deletingCommentId() === c.id ? '…' : 'Delete' }}
+          </button>
+        </li>
+      </ul>
+      <p class="muted" *ngIf="!t.comments.length">No comments yet.</p>
+
+      <div class="add-comment">
+        <input
+          type="text"
+          [ngModel]="newCommentText()"
+          (ngModelChange)="newCommentText.set($event)"
+          placeholder="Add a comment…"
+          [disabled]="addingComment()"
+        />
+        <button
+          type="button"
+          (click)="addComment()"
+          [disabled]="addingComment() || !newCommentText().trim()">
+          {{ addingComment() ? 'Adding…' : 'Add' }}
+        </button>
+      </div>
+    </div>
   </section>
 </div>

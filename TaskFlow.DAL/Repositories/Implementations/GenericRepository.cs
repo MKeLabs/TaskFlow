@@ -12,10 +12,10 @@ public class GenericRepository<TEntity>(TaskFlowDbContext dbContext) : IGenericR
     protected readonly DbSet<TEntity> DbSet = dbContext.Set<TEntity>();
 
     public Task<TEntity?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>
-        DbSet.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        DbSet.FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted, cancellationToken);
 
     public Task<List<TEntity>> GetAllAsync(CancellationToken cancellationToken = default) =>
-        DbSet.ToListAsync(cancellationToken);
+        DbSet.Where(x => !x.IsDeleted).ToListAsync(cancellationToken);
 
     public Task AddAsync(TEntity entity, CancellationToken cancellationToken = default) =>
         DbSet.AddAsync(entity, cancellationToken).AsTask();
