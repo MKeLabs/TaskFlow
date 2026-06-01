@@ -40,6 +40,7 @@
         <li *ngFor="let c of t.comments" class="comment-item">
           <span class="comment-text">{{ c.text }}</span>
           <button
+            *ngIf="isAdmin() || c.createdByUserId === currentUserId()"
             class="btn-sm danger"
             type="button"
             (click)="deleteComment(c.id)"
