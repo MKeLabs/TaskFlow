@@ -20,12 +20,23 @@ function parseRoles(token: string | null): string[] {
   }
 }
 
+function parseUserId(token: string | null): string | null {
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload['sub'] ?? null;
+  } catch {
+    return null;
+  }
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly _token = signal<string | null>(localStorage.getItem(TOKEN_KEY));
   readonly token = computed(() => this._token());
   readonly isAuthenticated = computed(() => !!this._token());
   readonly isAdmin = computed(() => parseRoles(this._token()).includes('Admin'));
+  readonly userId = computed(() => parseUserId(this._token()));
 
   constructor(private readonly http: HttpClient) {}
 

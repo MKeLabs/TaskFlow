@@ -11,7 +11,7 @@ export interface TaskItemDto {
   category: number;
   dueDate: string | null;
   tags: { id: number; name: string }[];
-  comments: { id: number; text: string }[];
+  comments: { id: number; taskItemId: number; text: string; createdByUserId: string | null }[];
 }
 
 export interface CreateTaskItemRequest {

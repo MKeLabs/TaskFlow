@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -9,6 +9,7 @@ import {
   TASK_CATEGORY_LABELS,
 } from '../../core/api/task-items.api';
 import { TaskCommentsApi } from '../../core/api/task-comments.api';
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'app-task-detail',
@@ -27,10 +28,13 @@ export class TaskDetailComponent {
 
   readonly statusLabels = TASK_STATUS_LABELS;
   readonly categoryLabels = TASK_CATEGORY_LABELS;
+  readonly currentUserId = computed(() => this.auth.userId());
+  readonly isAdmin = computed(() => this.auth.isAdmin());
 
   constructor(
     private readonly api: TaskItemsApi,
     private readonly commentsApi: TaskCommentsApi,
+    private readonly auth: AuthService,
     private readonly route: ActivatedRoute
   ) {
     const id = Number(this.route.snapshot.paramMap.get('id'));
