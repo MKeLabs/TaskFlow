@@ -11,14 +11,16 @@ public class UnitOfWork : IUnitOfWork
     private readonly ITaskCommentRepository _taskCommentsRepository;
     private readonly ITaskItemRepository _taskItemsRepository;
     private readonly ITaskTagRepository _taskTagsRepository;
+    private readonly IGoalsRepository _goalsRepository;
 
-    public UnitOfWork(TaskFlowDbContext dbContext, IProjectsRepository projectsRepository, ITaskCommentRepository taskCommentsRepository, ITaskItemRepository taskItemsRepository, ITaskTagRepository taskTagsRepository)
+    public UnitOfWork(TaskFlowDbContext dbContext, IProjectsRepository projectsRepository, ITaskCommentRepository taskCommentsRepository, ITaskItemRepository taskItemsRepository, ITaskTagRepository taskTagsRepository, IGoalsRepository goalsRepository)
     {
         _dbContext = dbContext;
         _projectsRepository = projectsRepository;
         _taskCommentsRepository = taskCommentsRepository;
         _taskItemsRepository = taskItemsRepository;
         _taskTagsRepository = taskTagsRepository;
+        _goalsRepository = goalsRepository;
     }
 
     public IProjectsRepository ProjectsRepository => _projectsRepository;
@@ -28,6 +30,8 @@ public class UnitOfWork : IUnitOfWork
     public ITaskItemRepository TaskItemsRepository => _taskItemsRepository;
 
     public ITaskTagRepository TaskTagsRepository => _taskTagsRepository;
+
+    public IGoalsRepository GoalsRepository => _goalsRepository;
 
     public Task SaveChangesAsync(CancellationToken cancellationToken = default)
         => _dbContext.SaveChangesAsync(cancellationToken);

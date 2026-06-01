@@ -19,19 +19,8 @@ public class ProjectsController(IProjectService projectService) : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<ActionResult<ProjectDto>> GetById(int id, CancellationToken cancellationToken)
     {
-        try
-        {
-            var project = await projectService.GetByIdAsync(id, cancellationToken);
-            return Ok();
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
+        var project = await projectService.GetByIdAsync(id, cancellationToken);
+        return Ok();
     }
 
     [HttpPost]
@@ -46,37 +35,15 @@ public class ProjectsController(IProjectService projectService) : ControllerBase
     [Authorize(Roles = AppRoles.Admin)]
     public async Task<IActionResult> Update(int id, [FromBody] ProjectUpsertDto dto, CancellationToken cancellationToken)
     {
-        try
-        {
-            await projectService.UpdateAsync(id, dto, cancellationToken);
-            return NoContent();
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
+        await projectService.UpdateAsync(id, dto, cancellationToken);
+        return NoContent();
     }
 
     [HttpDelete("{id:int}")]
     [Authorize(Roles = AppRoles.Admin)]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken) 
     {
-        try
-        {
-            await projectService.DeleteAsync(id, cancellationToken);
-            return NoContent();
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
+        await projectService.DeleteAsync(id, cancellationToken);
+        return NoContent();
     }
 }

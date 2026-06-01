@@ -1,4 +1,5 @@
 using TaskFlow.BLL.DTOs;
+using TaskFlow.BLL.Mappings;
 using TaskFlow.BLL.Services.Interfaces;
 using TaskFlow.DAL.Entities;
 using TaskFlow.DAL.Repositories.Interfaces;
@@ -24,15 +25,7 @@ public class TaskItemService(IUnitOfWork _unitOfWork) : ITaskItemService
 
     public async Task<TaskItemDto> CreateAsync(TaskItemUpsertDto dto, CancellationToken cancellationToken = default)
     {
-        var entity = new TaskItemEntity
-        {
-            ProjectId = dto.ProjectId,
-            Name = dto.Name,
-            Description = dto.Description,
-            Status = dto.Status,
-            Category = dto.Category,
-            DueDate = dto.DueDate
-        };
+        var entity = dto.ToEntity();
 
         await _unitOfWork.TaskItemsRepository.AddAsync(entity, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -67,24 +60,6 @@ public class TaskItemService(IUnitOfWork _unitOfWork) : ITaskItemService
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return true;
     }
-
     private static TaskItemDto Map(TaskItemEntity entity) =>
-        new TaskItemDto
-        {
-            Id = entity.Id,
-            ProjectId = entity.ProjectId,
-            ProjectName = entity.Project?.Name ?? string.Empty,
-            Name = entity.Name,
-            Description = entity.Description,
-            Status = entity.Status,
-            Category = entity.Category,
-            DueDate = entity.DueDate,
-            Tags = entity.TaskItemTags
-                .Where(x => x.TaskTag is not null)
-                .Select(x => new TaskTagDto { Id = x.TaskTag!.Id, Name = x.TaskTag.Name })
-                .ToList(),
-            Comments = entity.Comments
-                .Select(x => new TaskCommentDto { Id = x.Id, TaskItemId = x.TaskItemId, Text = x.Text })
-                .ToList()
-        };
+        entity.ToDto();
 }

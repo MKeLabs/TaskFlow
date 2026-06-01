@@ -6,6 +6,7 @@ public interface IUnitOfWork
     ITaskCommentRepository TaskCommentsRepository { get; }
     ITaskItemRepository TaskItemsRepository { get; }
     ITaskTagRepository TaskTagsRepository { get; }
+    IGoalsRepository GoalsRepository { get; }
 
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }
