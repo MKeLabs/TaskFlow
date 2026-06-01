@@ -6,37 +6,28 @@ using TaskFlow.DAL.Repositories.Interfaces;
 namespace TaskFlow.BLL.Services.Implementations;
 
 public class TaskCommentService(
-    IGenericRepository<TaskCommentEntity> commentRepository,
-    ITaskItemRepository taskItemRepository) : ITaskCommentService
+    IUnitOfWork _unitOfWork) : ITaskCommentService
 {
     public async Task<List<TaskCommentDto>> GetByTaskItemIdAsync(int taskItemId, CancellationToken cancellationToken = default)
     {
-        var task = await taskItemRepository.GetByIdWithDetailsAsync(taskItemId, cancellationToken);
+        var task = await _unitOfWork.TaskItemsRepository.GetByIdWithDetailsAsync(taskItemId, cancellationToken);
         if (task is null) return [];
 
-        return task.Comments.Select(x => new TaskCommentDto(x.Id, x.TaskItemId, x.Text)).ToList();
+        return task.Comments.Select(x => new TaskCommentDto { Id = x.Id, TaskItemId = x.TaskItemId, Text = x.Text, CreatedByUserId = x.CreatedByUserId }).ToList();
     }
 
-    public async Task<TaskCommentDto> CreateAsync(TaskCommentCreateDto dto, CancellationToken cancellationToken = default)
+    public async Task<TaskCommentDto> CreateAsync(TaskCommentCreateDto dto, string? createdByUserId, CancellationToken cancellationToken = default)
     {
-        var entity = new TaskCommentEntity
-        {
-            TaskItemId = dto.TaskItemId,
-            Text = dto.Text
-        };
-
-        await commentRepository.AddAsync(entity, cancellationToken);
-        await commentRepository.SaveChangesAsync(cancellationToken);
-        return new TaskCommentDto(entity.Id, entity.TaskItemId, entity.Text);
+        throw new NotImplementedException();
     }
 
     public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
-        var entity = await commentRepository.GetByIdAsync(id, cancellationToken);
-        if (entity is null) return false;
+        var entity = await _unitOfWork.TaskCommentsRepository.GetByIdAsync(id, cancellationToken);
+        if (entity is null) throw new KeyNotFoundException();
 
-        commentRepository.SoftDelete(entity);
-        await commentRepository.SaveChangesAsync(cancellationToken);
+        _unitOfWork.TaskCommentsRepository.Delete(entity);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         return true;
     }
 }

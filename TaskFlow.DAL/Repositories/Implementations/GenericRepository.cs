@@ -8,27 +8,19 @@ namespace TaskFlow.DAL.Repositories.Implementations;
 public class GenericRepository<TEntity>(TaskFlowDbContext dbContext) : IGenericRepository<TEntity>
     where TEntity : BaseEntity
 {
-    protected readonly TaskFlowDbContext DbContext = dbContext;
-    protected readonly DbSet<TEntity> DbSet = dbContext.Set<TEntity>();
+    protected readonly TaskFlowDbContext _dbContext = dbContext;
+    protected readonly DbSet<TEntity> _dbSet = dbContext.Set<TEntity>();
 
     public Task<TEntity?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>
-        DbSet.FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted, cancellationToken);
+        _dbSet.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
     public Task<List<TEntity>> GetAllAsync(CancellationToken cancellationToken = default) =>
-        DbSet.Where(x => !x.IsDeleted).ToListAsync(cancellationToken);
+        _dbSet.ToListAsync(cancellationToken);
 
     public Task AddAsync(TEntity entity, CancellationToken cancellationToken = default) =>
-        DbSet.AddAsync(entity, cancellationToken).AsTask();
+        _dbSet.AddAsync(entity, cancellationToken).AsTask();
 
-    public void Update(TEntity entity) => DbSet.Update(entity);
+    public void Update(TEntity entity) => _dbSet.Update(entity);
 
-    public void SoftDelete(TEntity entity)
-    {
-        entity.IsDeleted = true;
-        entity.ModifiedAt = DateTime.UtcNow;
-        DbSet.Update(entity);
-    }
-
-    public Task SaveChangesAsync(CancellationToken cancellationToken = default) =>
-        DbContext.SaveChangesAsync(cancellationToken);
+    public void Delete(TEntity entity)  => _dbSet.Remove(entity);
 }

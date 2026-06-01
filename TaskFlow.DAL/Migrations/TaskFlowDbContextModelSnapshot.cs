@@ -228,15 +228,6 @@ namespace TaskFlow.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("ModifiedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -244,7 +235,7 @@ namespace TaskFlow.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Projects");
+                    b.ToTable("Projects", (string)null);
                 });
 
             modelBuilder.Entity("TaskFlow.DAL.Entities.TaskCommentEntity", b =>
@@ -255,14 +246,8 @@ namespace TaskFlow.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("ModifiedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("CreatedByUserId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TaskItemId")
                         .HasColumnType("int");
@@ -276,7 +261,7 @@ namespace TaskFlow.DAL.Migrations
 
                     b.HasIndex("TaskItemId");
 
-                    b.ToTable("TaskComments");
+                    b.ToTable("TaskComments", (string)null);
                 });
 
             modelBuilder.Entity("TaskFlow.DAL.Entities.TaskItemEntity", b =>
@@ -290,20 +275,11 @@ namespace TaskFlow.DAL.Migrations
                     b.Property<int>("Category")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Description")
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
                     b.Property<DateTime?>("DueDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("ModifiedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
@@ -321,7 +297,7 @@ namespace TaskFlow.DAL.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("TaskItems");
+                    b.ToTable("TaskItems", (string)null);
                 });
 
             modelBuilder.Entity("TaskFlow.DAL.Entities.TaskItemTagEntity", b =>
@@ -336,7 +312,7 @@ namespace TaskFlow.DAL.Migrations
 
                     b.HasIndex("TaskTagId");
 
-                    b.ToTable("TaskItemTags");
+                    b.ToTable("TaskItemTags", (string)null);
                 });
 
             modelBuilder.Entity("TaskFlow.DAL.Entities.TaskTagEntity", b =>
@@ -347,15 +323,6 @@ namespace TaskFlow.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("ModifiedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -363,7 +330,7 @@ namespace TaskFlow.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TaskTags");
+                    b.ToTable("TaskTags", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

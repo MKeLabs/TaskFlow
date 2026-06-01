@@ -1,9 +1,9 @@
-namespace TaskFlow.DAL.Entities;
+namespace TaskFlow.BLL.DTOs;
 
-public class TaskCommentEntity : BaseEntity
+public record TaskCommentDto
 {
+    public int Id { get; set; }
     public int TaskItemId { get; set; }
-    public TaskItemEntity? TaskItem { get; set; }
     public string Text { get; set; } = string.Empty;
     public string? CreatedByUserId { get; set; }
 }

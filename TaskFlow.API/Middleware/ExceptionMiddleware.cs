@@ -1,9 +1,6 @@
-using System.Net;
-using System.Text.Json;
-
 namespace TaskFlow.API.Middleware;
 
-public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> _logger)
 {
     public async Task InvokeAsync(HttpContext context)
     {
@@ -13,12 +10,25 @@ public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddlewa
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Unhandled exception");
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            context.Response.ContentType = "application/json";
-
-            var payload = JsonSerializer.Serialize(new { message = "An unexpected error occurred." });
-            await context.Response.WriteAsync(payload);
+            _logger.LogError(ex, "Unhandled exception on {Method} {Path}",
+                context.Request.Method, context.Request.Path);
+            await HandleExceptionAsync(context, ex);
         }
+    }
+    private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+    {
+        var (statusCode, message) = exception switch
+        {
+            _ => (StatusCodes.Status500InternalServerError, "A aparut o eroare interna.")
+        };
+
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = statusCode;
+
+        return context.Response.WriteAsJsonAsync(new
+        {
+            success = false,
+            message
+        });
     }
 }

@@ -17,8 +17,19 @@ public class TaskItemsController(ITaskItemService taskItemService) : ControllerB
     [HttpGet("{id:int}")]
     public async Task<ActionResult<TaskItemDto>> GetById(int id, CancellationToken cancellationToken)
     {
-        var item = await taskItemService.GetByIdAsync(id, cancellationToken);
-        return item is null ? NotFound() : Ok(item);
+        try
+        {
+            var item = await taskItemService.GetByIdAsync(id, cancellationToken);
+            return Ok(item);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
     }
 
     [HttpPost]
@@ -29,10 +40,39 @@ public class TaskItemsController(ITaskItemService taskItemService) : ControllerB
     }
 
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> Update(int id, [FromBody] TaskItemUpsertDto dto, CancellationToken cancellationToken) =>
-        await taskItemService.UpdateAsync(id, dto, cancellationToken) ? NoContent() : NotFound();
+    public async Task<IActionResult> Update(int id, [FromBody] TaskItemUpsertDto dto, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await taskItemService.UpdateAsync(id, dto, cancellationToken);
+            return NoContent();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
 
     [HttpDelete("{id:int}")]
-    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken) =>
-        await taskItemService.DeleteAsync(id, cancellationToken) ? NoContent() : NotFound();
+    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
+    {
+        try
+        { 
+            await taskItemService.DeleteAsync(id, cancellationToken);
+            return NoContent();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+
+    }
 }
