@@ -17,19 +17,8 @@ public class TaskItemsController(ITaskItemService taskItemService) : ControllerB
     [HttpGet("{id:int}")]
     public async Task<ActionResult<TaskItemDto>> GetById(int id, CancellationToken cancellationToken)
     {
-        try
-        {
-            var item = await taskItemService.GetByIdAsync(id, cancellationToken);
-            return Ok(item);
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
+        var item = await taskItemService.GetByIdAsync(id, cancellationToken);
+        return Ok(item);
     }
 
     [HttpPost]
@@ -42,37 +31,14 @@ public class TaskItemsController(ITaskItemService taskItemService) : ControllerB
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] TaskItemUpsertDto dto, CancellationToken cancellationToken)
     {
-        try
-        {
-            await taskItemService.UpdateAsync(id, dto, cancellationToken);
-            return NoContent();
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
+        await taskItemService.UpdateAsync(id, dto, cancellationToken);
+        return NoContent();
     }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
-        try
-        { 
-            await taskItemService.DeleteAsync(id, cancellationToken);
-            return NoContent();
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
-
+        await taskItemService.DeleteAsync(id, cancellationToken);
+        return NoContent();
     }
 }

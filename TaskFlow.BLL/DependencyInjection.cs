@@ -12,6 +12,7 @@ public static class DependencyInjection
         services.AddScoped<ITaskTagService, TaskTagService>();
         services.AddScoped<ITaskCommentService, TaskCommentService>();
         services.AddScoped<ITaskItemService, TaskItemService>();
+        services.AddScoped<IGoalsService, GoalsService>();
         return services;
     }
 }

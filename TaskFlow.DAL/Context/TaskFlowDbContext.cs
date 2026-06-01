@@ -11,6 +11,7 @@ public class TaskFlowDbContext(DbContextOptions<TaskFlowDbContext> options) : Id
     public DbSet<TaskCommentEntity> TaskComments => Set<TaskCommentEntity>();
     public DbSet<TaskTagEntity> TaskTags => Set<TaskTagEntity>();
     public DbSet<TaskItemTagEntity> TaskItemTags => Set<TaskItemTagEntity>();
+    public DbSet<GoalEntity> Goals => Set<GoalEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -54,6 +55,14 @@ public class TaskFlowDbContext(DbContextOptions<TaskFlowDbContext> options) : Id
             entity.HasOne(x => x.TaskTag)
                 .WithMany(x => x.TaskItemTags)
                 .HasForeignKey(x => x.TaskTagId);
+        });
+
+        modelBuilder.Entity<GoalEntity>(entity =>
+        {
+            entity.Property(x => x.Title).HasMaxLength(250).IsRequired();
+            entity.Property(x => x.IsCompleted).HasDefaultValue(false);
+
+            entity.HasOne(x => x.Project).WithMany(x => x.Goals).HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

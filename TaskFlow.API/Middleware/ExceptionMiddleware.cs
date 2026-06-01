@@ -15,10 +15,14 @@ public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddlewa
             await HandleExceptionAsync(context, ex);
         }
     }
+
     private static Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         var (statusCode, message) = exception switch
         {
+            AccessViolationException => (StatusCodes.Status403Forbidden, "Acces interzis."),
+            KeyNotFoundException => (StatusCodes.Status404NotFound, "Resursa nu a fost gasita."),
+            ArgumentException => (StatusCodes.Status400BadRequest, "Argument invalid."),
             _ => (StatusCodes.Status500InternalServerError, "A aparut o eroare interna.")
         };
 

@@ -18,7 +18,16 @@ public class TaskCommentService(
 
     public async Task<TaskCommentDto> CreateAsync(TaskCommentCreateDto dto, string? createdByUserId, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var entity = new TaskCommentEntity
+        {
+            TaskItemId = dto.TaskItemId,
+            Text = dto.Text,
+            CreatedByUserId = createdByUserId
+        };
+
+        await _unitOfWork.TaskCommentsRepository.AddAsync(entity, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return new TaskCommentDto { Id = entity.Id, TaskItemId = entity.TaskItemId, Text = entity.Text, CreatedByUserId = entity.CreatedByUserId };
     }
 
     public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)

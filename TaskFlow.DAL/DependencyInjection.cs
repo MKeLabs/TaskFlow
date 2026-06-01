@@ -20,11 +20,13 @@ public static class DependencyInjection
         services.AddScoped<IGenericRepository<TaskTagEntity>, GenericRepository<TaskTagEntity>>();
         services.AddScoped<IGenericRepository<TaskItemEntity>, TaskItemRepository>();
         services.AddScoped<IGenericRepository<TaskTagEntity>, TaskTagRepository>();
+        services.AddScoped<IGenericRepository<GoalEntity>, GoalsRepository>();
 
         services.AddScoped<IProjectsRepository, ProjectsRepository>();
         services.AddScoped<ITaskCommentRepository, TaskCommentRepository>();
         services.AddScoped<ITaskItemRepository, TaskItemRepository>();
         services.AddScoped<ITaskTagRepository, TaskTagRepository>();
+        services.AddScoped<IGoalsRepository, GoalsRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

@@ -28,18 +28,7 @@ public class TaskCommentsController(ITaskCommentService taskCommentService) : Co
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
-        try
-        {
-            await taskCommentService.DeleteAsync(id, cancellationToken);
-            return NoContent();
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
+        await taskCommentService.DeleteAsync(id, cancellationToken);
+        return NoContent();
     }
 }
