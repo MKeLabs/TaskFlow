@@ -5,45 +5,56 @@ using TaskFlow.DAL.Repositories.Interfaces;
 
 namespace TaskFlow.BLL.Services.Implementations;
 
-public class ProjectService(IGenericRepository<ProjectEntity> projectRepository) : IProjectService
+public class ProjectService : IProjectService
 {
+    private readonly IUnitOfWork _unitOfWork;
+
+    public ProjectService(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
     public async Task<List<ProjectDto>> GetAllAsync(CancellationToken cancellationToken = default) =>
-        (await projectRepository.GetAllAsync(cancellationToken))
-        .Select(x => new ProjectDto(x.Id, x.Name))
+        (await _unitOfWork.ProjectsRepository.GetAllAsync(cancellationToken))
+        .Select(x => new ProjectDto { Id = x.Id, Name = x.Name })
         .ToList();
 
-    public async Task<ProjectDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<ProjectDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var entity = await projectRepository.GetByIdAsync(id, cancellationToken);
-        return entity is null ? null : new ProjectDto(entity.Id, entity.Name);
+        var entity = await _unitOfWork.ProjectsRepository.GetByIdAsync(id, cancellationToken);
+
+        if (entity == null)
+            throw new KeyNotFoundException($"Project with id {id} not found.");
+
+        return new ProjectDto { Id = entity.Id, Name = entity.Name };
     }
 
     public async Task<ProjectDto> CreateAsync(ProjectUpsertDto dto, CancellationToken cancellationToken = default)
     {
         var entity = new ProjectEntity { Name = dto.Name };
-        await projectRepository.AddAsync(entity, cancellationToken);
-        await projectRepository.SaveChangesAsync(cancellationToken);
-        return new ProjectDto(entity.Id, entity.Name);
+        await _unitOfWork.ProjectsRepository.AddAsync(entity, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return new ProjectDto { Id = entity.Id, Name = entity.Name };
     }
 
     public async Task<bool> UpdateAsync(int id, ProjectUpsertDto dto, CancellationToken cancellationToken = default)
     {
-        var entity = await projectRepository.GetByIdAsync(id, cancellationToken);
-        if (entity is null) return false;
+        var entity = await _unitOfWork.ProjectsRepository.GetByIdAsync(id, cancellationToken);
+        if (entity is null) throw new KeyNotFoundException();
 
         entity.Name = dto.Name;
-        projectRepository.Update(entity);
-        await projectRepository.SaveChangesAsync(cancellationToken);
+        _unitOfWork.ProjectsRepository.Update(entity);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         return true;
     }
 
     public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
-        var entity = await projectRepository.GetByIdAsync(id, cancellationToken);
-        if (entity is null) return false;
+        var entity = await _unitOfWork.ProjectsRepository.GetByIdAsync(id, cancellationToken);
+        if (entity is null) throw new KeyNotFoundException();
 
-        projectRepository.SoftDelete(entity);
-        await projectRepository.SaveChangesAsync(cancellationToken);
+        _unitOfWork.ProjectsRepository.Delete(entity);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         return true;
     }
 }

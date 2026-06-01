@@ -8,6 +8,5 @@ public interface IGenericRepository<TEntity> where TEntity : BaseEntity
     Task<List<TEntity>> GetAllAsync(CancellationToken cancellationToken = default);
     Task AddAsync(TEntity entity, CancellationToken cancellationToken = default);
     void Update(TEntity entity);
-    void SoftDelete(TEntity entity);
-    Task SaveChangesAsync(CancellationToken cancellationToken = default);
+    void Delete(TEntity entity);
 }

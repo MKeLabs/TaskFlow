@@ -9,14 +9,14 @@ public class TaskItemRepository(TaskFlowDbContext dbContext)
     : GenericRepository<TaskItemEntity>(dbContext), ITaskItemRepository
 {
     public Task<List<TaskItemEntity>> GetAllWithDetailsAsync(CancellationToken cancellationToken = default) =>
-        DbSet.Include(x => x.Project)
+        _dbSet.Include(x => x.Project)
             .Include(x => x.Comments)
             .Include(x => x.TaskItemTags)
             .ThenInclude(x => x.TaskTag)
             .ToListAsync(cancellationToken);
 
     public Task<TaskItemEntity?> GetByIdWithDetailsAsync(int id, CancellationToken cancellationToken = default) =>
-        DbSet.Include(x => x.Project)
+        _dbSet.Include(x => x.Project)
             .Include(x => x.Comments)
             .Include(x => x.TaskItemTags)
             .ThenInclude(x => x.TaskTag)

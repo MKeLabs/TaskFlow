@@ -19,14 +19,12 @@ public class TaskFlowDbContext(DbContextOptions<TaskFlowDbContext> options) : Id
         modelBuilder.Entity<ProjectEntity>(entity =>
         {
             entity.Property(x => x.Name).HasMaxLength(200).IsRequired();
-            entity.HasQueryFilter(x => !x.IsDeleted);
         });
 
         modelBuilder.Entity<TaskItemEntity>(entity =>
         {
             entity.Property(x => x.Name).HasMaxLength(200).IsRequired();
             entity.Property(x => x.Description).HasMaxLength(2000);
-            entity.HasQueryFilter(x => !x.IsDeleted);
             entity.HasOne(x => x.Project)
                 .WithMany(x => x.TaskItems)
                 .HasForeignKey(x => x.ProjectId)
@@ -36,7 +34,6 @@ public class TaskFlowDbContext(DbContextOptions<TaskFlowDbContext> options) : Id
         modelBuilder.Entity<TaskCommentEntity>(entity =>
         {
             entity.Property(x => x.Text).HasMaxLength(2000).IsRequired();
-            entity.HasQueryFilter(x => !x.IsDeleted);
             entity.HasOne(x => x.TaskItem)
                 .WithMany(x => x.Comments)
                 .HasForeignKey(x => x.TaskItemId)
@@ -46,7 +43,6 @@ public class TaskFlowDbContext(DbContextOptions<TaskFlowDbContext> options) : Id
         modelBuilder.Entity<TaskTagEntity>(entity =>
         {
             entity.Property(x => x.Name).HasMaxLength(100).IsRequired();
-            entity.HasQueryFilter(x => !x.IsDeleted);
         });
 
         modelBuilder.Entity<TaskItemTagEntity>(entity =>
@@ -59,25 +55,5 @@ public class TaskFlowDbContext(DbContextOptions<TaskFlowDbContext> options) : Id
                 .WithMany(x => x.TaskItemTags)
                 .HasForeignKey(x => x.TaskTagId);
         });
-    }
-
-    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        var now = DateTime.UtcNow;
-        foreach (var entry in ChangeTracker.Entries<BaseEntity>())
-        {
-            if (entry.State == EntityState.Added)
-            {
-                entry.Entity.CreatedAt = now;
-                entry.Entity.ModifiedAt = now;
-            }
-
-            if (entry.State == EntityState.Modified)
-            {
-                entry.Entity.ModifiedAt = now;
-            }
-        }
-
-        return base.SaveChangesAsync(cancellationToken);
     }
 }

@@ -5,19 +5,21 @@ using TaskFlow.DAL.Repositories.Interfaces;
 
 namespace TaskFlow.BLL.Services.Implementations;
 
-public class TaskItemService(
-    ITaskItemRepository taskItemRepository,
-    IGenericRepository<TaskTagEntity> tagRepository) : ITaskItemService
+public class TaskItemService(IUnitOfWork _unitOfWork) : ITaskItemService
 {
     public async Task<List<TaskItemDto>> GetAllAsync(CancellationToken cancellationToken = default) =>
-        (await taskItemRepository.GetAllWithDetailsAsync(cancellationToken))
+        (await _unitOfWork.TaskItemsRepository.GetAllWithDetailsAsync(cancellationToken))
         .Select(Map)
         .ToList();
 
     public async Task<TaskItemDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var entity = await taskItemRepository.GetByIdWithDetailsAsync(id, cancellationToken);
-        return entity is null ? null : Map(entity);
+        var entity = await _unitOfWork.TaskItemsRepository.GetByIdWithDetailsAsync(id, cancellationToken);
+
+        if (entity == null)
+            throw new KeyNotFoundException();
+
+        return Map(entity);
     }
 
     public async Task<TaskItemDto> CreateAsync(TaskItemUpsertDto dto, CancellationToken cancellationToken = default)
@@ -32,18 +34,16 @@ public class TaskItemService(
             DueDate = dto.DueDate
         };
 
-        await ApplyTagsAsync(entity, dto.TagIds, cancellationToken);
-        await taskItemRepository.AddAsync(entity, cancellationToken);
-        await taskItemRepository.SaveChangesAsync(cancellationToken);
+        await _unitOfWork.TaskItemsRepository.AddAsync(entity, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        var fullEntity = await taskItemRepository.GetByIdWithDetailsAsync(entity.Id, cancellationToken);
-        return Map(fullEntity!);
+        return Map(entity);
     }
 
     public async Task<bool> UpdateAsync(int id, TaskItemUpsertDto dto, CancellationToken cancellationToken = default)
     {
-        var entity = await taskItemRepository.GetByIdWithDetailsAsync(id, cancellationToken);
-        if (entity is null) return false;
+        var entity = await _unitOfWork.TaskItemsRepository.GetByIdWithDetailsAsync(id, cancellationToken);
+        if (entity is null) throw new KeyNotFoundException();
 
         entity.ProjectId = dto.ProjectId;
         entity.Name = dto.Name;
@@ -52,54 +52,39 @@ public class TaskItemService(
         entity.Category = dto.Category;
         entity.DueDate = dto.DueDate;
         entity.TaskItemTags.Clear();
-        await ApplyTagsAsync(entity, dto.TagIds, cancellationToken);
 
-        taskItemRepository.Update(entity);
-        await taskItemRepository.SaveChangesAsync(cancellationToken);
+        _unitOfWork.TaskItemsRepository.Update(entity);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         return true;
     }
 
     public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
-        var entity = await taskItemRepository.GetByIdAsync(id, cancellationToken);
-        if (entity is null) return false;
+        var entity = await _unitOfWork.TaskItemsRepository.GetByIdAsync(id, cancellationToken);
+        if (entity is null) throw new KeyNotFoundException();
 
-        taskItemRepository.SoftDelete(entity);
-        await taskItemRepository.SaveChangesAsync(cancellationToken);
+        _unitOfWork.TaskItemsRepository.Delete(entity);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         return true;
     }
 
-    private async Task ApplyTagsAsync(TaskItemEntity taskItem, IEnumerable<int> tagIds, CancellationToken cancellationToken)
-    {
-        foreach (var tagId in tagIds.Distinct())
-        {
-            var tag = await tagRepository.GetByIdAsync(tagId, cancellationToken);
-            if (tag is null) continue;
-
-            taskItem.TaskItemTags.Add(new TaskItemTagEntity
-            {
-                TaskItem = taskItem,
-                TaskTagId = tag.Id,
-                TaskTag = tag
-            });
-        }
-    }
-
     private static TaskItemDto Map(TaskItemEntity entity) =>
-        new(
-            entity.Id,
-            entity.ProjectId,
-            entity.Project?.Name ?? string.Empty,
-            entity.Name,
-            entity.Description,
-            entity.Status,
-            entity.Category,
-            entity.DueDate,
-            entity.TaskItemTags
+        new TaskItemDto
+        {
+            Id = entity.Id,
+            ProjectId = entity.ProjectId,
+            ProjectName = entity.Project?.Name ?? string.Empty,
+            Name = entity.Name,
+            Description = entity.Description,
+            Status = entity.Status,
+            Category = entity.Category,
+            DueDate = entity.DueDate,
+            Tags = entity.TaskItemTags
                 .Where(x => x.TaskTag is not null)
-                .Select(x => new TaskTagDto(x.TaskTag!.Id, x.TaskTag.Name))
+                .Select(x => new TaskTagDto { Id = x.TaskTag!.Id, Name = x.TaskTag.Name })
                 .ToList(),
-            entity.Comments
-                .Select(x => new TaskCommentDto(x.Id, x.TaskItemId, x.Text))
-                .ToList());
+            Comments = entity.Comments
+                .Select(x => new TaskCommentDto { Id = x.Id, TaskItemId = x.TaskItemId, Text = x.Text })
+                .ToList()
+        };
 }

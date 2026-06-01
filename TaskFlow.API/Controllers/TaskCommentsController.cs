@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using TaskFlow.BLL.DTOs;
+using TaskFlow.BLL.Services.Implementations;
 using TaskFlow.BLL.Services.Interfaces;
+using TaskFlow.DAL.Auth;
 
 namespace TaskFlow.API.Controllers;
 
@@ -17,11 +20,26 @@ public class TaskCommentsController(ITaskCommentService taskCommentService) : Co
     [HttpPost]
     public async Task<ActionResult<TaskCommentDto>> Create([FromBody] TaskCommentCreateDto dto, CancellationToken cancellationToken)
     {
-        var created = await taskCommentService.CreateAsync(dto, cancellationToken);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var created = await taskCommentService.CreateAsync(dto, userId, cancellationToken);
         return Ok(created);
     }
 
     [HttpDelete("{id:int}")]
-    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken) =>
-        await taskCommentService.DeleteAsync(id, cancellationToken) ? NoContent() : NotFound();
+    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await taskCommentService.DeleteAsync(id, cancellationToken);
+            return NoContent();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
 }

@@ -15,10 +15,18 @@ public static class DependencyInjection
         services.AddDbContext<TaskFlowDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("TaskFlowDb")));
 
-        services.AddScoped<IGenericRepository<ProjectEntity>, GenericRepository<ProjectEntity>>();
-        services.AddScoped<IGenericRepository<TaskCommentEntity>, GenericRepository<TaskCommentEntity>>();
+        services.AddScoped<IGenericRepository<ProjectEntity>, ProjectsRepository>();
+        services.AddScoped<IGenericRepository<TaskCommentEntity>, TaskCommentRepository>();
         services.AddScoped<IGenericRepository<TaskTagEntity>, GenericRepository<TaskTagEntity>>();
+        services.AddScoped<IGenericRepository<TaskItemEntity>, TaskItemRepository>();
+        services.AddScoped<IGenericRepository<TaskTagEntity>, TaskTagRepository>();
+
+        services.AddScoped<IProjectsRepository, ProjectsRepository>();
+        services.AddScoped<ITaskCommentRepository, TaskCommentRepository>();
         services.AddScoped<ITaskItemRepository, TaskItemRepository>();
+        services.AddScoped<ITaskTagRepository, TaskTagRepository>();
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
     }

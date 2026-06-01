@@ -17,6 +17,11 @@ using TaskFlow.DAL.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// This is for the mdf binding, ensure the Data folder is present in the `DataDirectory`
+var dataDir = Path.Combine(builder.Environment.ContentRootPath, "Data");
+Directory.CreateDirectory(dataDir);
+AppDomain.CurrentDomain.SetData("DataDirectory", dataDir);
+
 builder.Host.UseSerilog((context, loggerConfiguration) =>
 {
     loggerConfiguration

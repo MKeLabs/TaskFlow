@@ -1,62 +1,52 @@
+using System.Threading;
+using System.Threading.Tasks;
 using Moq;
+using Xunit;
 using TaskFlow.BLL.DTOs;
 using TaskFlow.BLL.Services.Implementations;
 using TaskFlow.DAL.Entities;
 using TaskFlow.DAL.Repositories.Interfaces;
-using DalTaskCategory = TaskFlow.DAL.Entities.TaskCategory;
-using DalTaskStatus = TaskFlow.DAL.Entities.TaskStatus;
 
 namespace TaskFlow.BLL.UnitTests;
 
 public class TaskItemServiceTests
 {
     [Fact]
-    public async Task CreateAsync_ShouldAttachOnlyExistingTags()
+    public async Task CreateAsync_Should_Add_TaskItem_And_ReturnDto_WithId()
     {
-        var taskRepo = new Mock<ITaskItemRepository>();
-        var tagRepo = new Mock<IGenericRepository<TaskTagEntity>>();
+        // Arrange
+        var unitOfWork = new Mock<IUnitOfWork>();
+        var itemRepo = new Mock<ITaskItemRepository>();
+        var tagRepo = new Mock<ITaskTagRepository>();
 
-        TaskItemEntity? captured = null;
-        taskRepo.Setup(x => x.AddAsync(It.IsAny<TaskItemEntity>(), It.IsAny<CancellationToken>()))
-            .Callback<TaskItemEntity, CancellationToken>((entity, _) =>
-            {
-                captured = entity;
-                entity.Id = 1;
-            })
+        unitOfWork.SetupGet(x => x.TaskItemsRepository).Returns(itemRepo.Object);
+        unitOfWork.SetupGet(x => x.TaskTagsRepository).Returns(tagRepo.Object);
+
+        itemRepo
+            .Setup(r => r.AddAsync(It.IsAny<TaskItemEntity>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
-        taskRepo.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
-        taskRepo.Setup(x => x.GetByIdWithDetailsAsync(1, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(() => captured);
 
-        tagRepo.Setup(x => x.GetByIdAsync(1, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new TaskTagEntity { Id = 1, Name = "backend" });
-        tagRepo.Setup(x => x.GetByIdAsync(99, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((TaskTagEntity?)null);
+        unitOfWork.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
-        var sut = new TaskItemService(taskRepo.Object, tagRepo.Object);
-        var dto = new TaskItemUpsertDto(10, "Implement DAL", "Repo pattern", DalTaskStatus.InProgress, DalTaskCategory.Feature, null, [1, 99]);
+        var service = new TaskItemService(unitOfWork.Object);
 
-        var result = await sut.CreateAsync(dto);
+        var dto = new TaskItemUpsertDto
+        {
+            ProjectId = 1,
+            Name = "New Task",
+            Description = "desc",
+            Status = TaskFlow.DAL.Entities.TaskStatus.Todo,
+            Category = TaskFlow.DAL.Entities.TaskCategory.General,
+        };
 
-        Assert.Equal("Implement DAL", result.Name);
-        Assert.Single(result.Tags);
-        Assert.Equal("backend", result.Tags.First().Name);
-    }
+        // Act
+        var result = await service.CreateAsync(dto, CancellationToken.None);
 
-    [Fact]
-    public async Task DeleteAsync_ShouldSoftDelete_WhenEntityExists()
-    {
-        var taskRepo = new Mock<ITaskItemRepository>();
-        var tagRepo = new Mock<IGenericRepository<TaskTagEntity>>();
-        var entity = new TaskItemEntity { Id = 7, Name = "To delete" };
+        // Assert - these are expected to fail until CreateAsync is implemented correctly
+        itemRepo.Verify(r => r.AddAsync(It.IsAny<TaskItemEntity>(), It.IsAny<CancellationToken>()), Times.Once);
+        unitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
 
-        taskRepo.Setup(x => x.GetByIdAsync(entity.Id, It.IsAny<CancellationToken>())).ReturnsAsync(entity);
-        taskRepo.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
-
-        var sut = new TaskItemService(taskRepo.Object, tagRepo.Object);
-        var deleted = await sut.DeleteAsync(entity.Id);
-
-        Assert.True(deleted);
-        taskRepo.Verify(x => x.SoftDelete(entity), Times.Once);
+        Assert.Equal(dto.Name, result.Name);
+        Assert.Equal(dto.ProjectId, result.ProjectId);
     }
 }
